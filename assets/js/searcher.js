@@ -1,5 +1,4 @@
-let nuevoProducto =(producto)=>{
-    let {name, price, src, type}=producto;
+let nuevoProducto =(name, price, src, type)=>{
     let nuevoProducto=
     `
     <div class="col-xl-3 col-md-6 mb-xl-0 mb-4 mt-4">
@@ -21,17 +20,19 @@ let nuevoProducto =(producto)=>{
         </p>
       </div>
     </div>
-  </div>
-  
+  </div>  
     `
     return nuevoProducto;
 }
 
 
 let loadProducts = ()=> {
-  let URLjson = `https://raw.githubusercontent.com/Bootcamp-Espol/FSD02/main/S03D03/clase/recursos/products.json`
+  let URLjson = `https://raw.githubusercontent.com/Bootcamp-Espol/Datos/main/products.json`
+  let URLxml = `https://raw.githubusercontent.com/Bootcamp-Espol/Datos/main/products.xml`
   let listaProductos = document.getElementById("productList");
-  let request = ( myURL ) => {
+  listaProductos.innerHTML = '';
+
+  let requestJson = ( myURL ) => {
 
     fetch( myURL )
       .then(response => response.json() ) /* Convierte el response a JSON */
@@ -39,10 +40,10 @@ let loadProducts = ()=> {
 
         /* Callback por éxito: Procese el result */
         
-        for (let producto of result ){
-          listaProductos.insertAdjacentHTML(beforeend, nuevoProducto(producto))
-        }        
-      
+        result.forEach((producto)=>{
+          let {name, price, src, type}=producto;
+          listaProductos.insertAdjacentHTML('beforeend', nuevoProducto(name, price, src, type))
+        })
       })
       .catch(error => {
         
@@ -51,10 +52,41 @@ let loadProducts = ()=> {
         console.log( error );
 
       });
-    
   }
 
-  request(URL);
+  let requestXML = async ( myURL ) => {
+
+    try {
+
+      let response = await fetch( myURL ); 
+      let result = await response.text() /* Convierte el response a texto */
+      let xml = (new DOMParser()).parseFromString(result, 'application/xml');
+
+      /* Éxito: Procese el xml */
+    
+      let productos = xml.getElementsByTagName("product");
+
+      for (let i = 0; i < productos.length; i++) {
+    let name = productos[i].getElementsByTagName("name")[0].childNodes[0].nodeValue;
+    let price = productos[i].getElementsByTagName("price")[0].childNodes[0].nodeValue;
+    let src = productos[i].getElementsByTagName("src")[0].childNodes[0].nodeValue;
+    let type = productos[i].getElementsByTagName("type")[0].childNodes[0].nodeValue;
+    listaProductos.insertAdjacentHTML('beforeend', nuevoProducto(name, price, src, type));
+
+    }} catch (error) {
+
+      /* Fallo: Procese el error */
+      
+      console.log( error );
+
+    }
+
+  }
+
+
+
+  requestJson(URLjson);
+  requestXML( URLxml );
     
  
 } 
