@@ -26,7 +26,7 @@ let nuevoProducto =(name, price, src, type)=>{
 }
 
 
-let loadProducts = ()=> {
+let loadProducts = (nombreProducto)=> {
   let URLjson = `https://raw.githubusercontent.com/Bootcamp-Espol/Datos/main/products.json`
   let URLxml = `https://raw.githubusercontent.com/Bootcamp-Espol/Datos/main/products.xml`
   let listaProductos = document.getElementById("productList");
@@ -42,7 +42,9 @@ let loadProducts = ()=> {
         
         result.forEach((producto)=>{
           let {name, price, src, type}=producto;
-          listaProductos.insertAdjacentHTML('beforeend', nuevoProducto(name, price, src, type))
+          if (nombreProducto==="ALL" || name.toLowerCase().includes(nombreProducto)|| type.toLowerCase().includes(nombreProducto)){
+            listaProductos.insertAdjacentHTML('beforeend', nuevoProducto(name, price, src, type))
+          }
         })
       })
       .catch(error => {
@@ -71,7 +73,9 @@ let loadProducts = ()=> {
     let price = productos[i].getElementsByTagName("price")[0].childNodes[0].nodeValue;
     let src = productos[i].getElementsByTagName("src")[0].childNodes[0].nodeValue;
     let type = productos[i].getElementsByTagName("type")[0].childNodes[0].nodeValue;
-    listaProductos.insertAdjacentHTML('beforeend', nuevoProducto(name, price, src, type));
+    if (nombreProducto==="ALL" || name.toLowerCase().includes(nombreProducto)|| type.toLowerCase().includes(nombreProducto)){
+      listaProductos.insertAdjacentHTML('beforeend', nuevoProducto(name, price, src, type))
+    }
 
     }} catch (error) {
 
@@ -83,12 +87,20 @@ let loadProducts = ()=> {
 
   }
 
-
-
   requestJson(URLjson);
   requestXML( URLxml );
     
  
 } 
 
-loadProducts ();
+loadProducts ("ALL");
+
+
+let input = document.getElementById('text');
+let filterBtn = document.getElementById('filter');
+
+filterBtn.addEventListener('click', () => {
+  let nombreProducto = input.value.toLowerCase();
+  loadProducts(nombreProducto===""?"ALL":nombreProducto);
+});
+
