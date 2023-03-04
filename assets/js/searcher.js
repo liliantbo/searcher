@@ -104,3 +104,12 @@ filterBtn.addEventListener('click', () => {
   loadProducts(nombreProducto===""?"ALL":nombreProducto);
 });
 
+
+input.addEventListener('keydown', function(event) {
+  if (event.key === 'Enter') {
+    let nombreProducto = input.value.toLowerCase();
+    loadProducts(nombreProducto===""?"ALL":nombreProducto);
+  }
+});
+
+
